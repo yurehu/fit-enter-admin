@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -16,9 +16,9 @@ model Student {
   parentEmail   String
   qrToken       String   @unique @default(uuid())
   schoolId      String?
-  targetSchools String?  // JSON配列: ["松山東高校", "愛光高校"]
-  lineUserId    String?  // LINE連携用（将来用）
-  notes         String?  // メモ欄
+  targetSchools String? // JSON配列: ["松山東高校", "愛光高校"]
+  lineUserId    String? // LINE連携用（将来用）
+  notes         String? // メモ欄
   createdAt     DateTime @default(now())
 
   school           School?           @relation(fields: [schoolId], references: [id])
@@ -26,8 +26,6 @@ model Student {
   enrollments      ClassEnrollment[]
   classAttendances ClassAttendance[]
   examResults      ExamResult[]
-
-  @@index([schoolId])
 }
 
 // ===== 出席管理 =====
@@ -35,7 +33,7 @@ model Student {
 model Attendance {
   id        String   @id @default(cuid())
   studentId String
-  type      String   // "checkin" | "checkout"
+  type      String // "checkin" | "checkout"
   timestamp DateTime @default(now())
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
@@ -49,7 +47,7 @@ model Admin {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
-  pin       String?  // bcryptハッシュ化された4桁PINコード
+  pin       String? // bcryptハッシュ化された4桁PINコード
   createdAt DateTime @default(now())
 }
 
@@ -58,9 +56,9 @@ model Admin {
 model WeeklyClass {
   id        String   @id @default(cuid())
   title     String
-  weekday   Int      // 0=日曜 ... 6=土曜
-  startTime String   // "HH:mm" 形式
-  endTime   String   // "HH:mm" 形式
+  weekday   Int // 0=日曜 ... 6=土曜
+  startTime String // "HH:mm" 形式
+  endTime   String // "HH:mm" 形式
   createdAt DateTime @default(now())
 
   enrollments ClassEnrollment[]
@@ -82,7 +80,7 @@ model ClassAttendance {
   id            String   @id @default(cuid())
   weeklyClassId String
   studentId     String
-  date          String   // "YYYY-MM-DD" 形式
+  date          String // "YYYY-MM-DD" 形式
   status        String   @default("present")
   createdAt     DateTime @default(now())
 
@@ -97,7 +95,7 @@ model ClassAttendance {
 model School {
   id        String   @id @default(cuid())
   name      String   @unique
-  type      String   // "小学校" | "中学校" | "高校" | "その他"
+  type      String // "小学校" | "中学校" | "高校" | "その他"
   createdAt DateTime @default(now())
 
   students Student[]
@@ -108,32 +106,26 @@ model School {
 model ExamResult {
   id        String   @id @default(cuid())
   studentId String
-  subject   String   // "数学", "英語" 等
+  subject   String // "数学", "英語" 等
   score     Int
   maxScore  Int      @default(100)
-  examName  String   // "第1回模試", "中間テスト" 等
-  examDate  String   // "YYYY-MM-DD"
+  examName  String // "第1回模試", "中間テスト" 等
+  examDate  String // "YYYY-MM-DD"
   notes     String?
   createdAt DateTime @default(now())
 
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
-
-  @@index([studentId])
-  @@index([examDate])
 }
 
 // ===== 監査ログ =====
 
 model AuditLog {
   id         String   @id @default(cuid())
-  action     String   // "LOGIN_SUCCESS", "STUDENT_CREATE" 等
+  action     String // "LOGIN_SUCCESS", "STUDENT_CREATE" 等
   adminId    String?
   adminEmail String?
   targetId   String?
   detail     String?
   ip         String?
   createdAt  DateTime @default(now())
-
-  @@index([createdAt])
-  @@index([action])
 }

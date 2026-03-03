@@ -15,6 +15,7 @@ export default function AdminLayout({
         { href: "/admin", label: "ダッシュボード", icon: "📊" },
         { href: "/admin/students", label: "生徒管理", icon: "👥" },
         { href: "/admin/classes", label: "授業管理", icon: "📚" },
+        { href: "/admin/schools", label: "学校管理", icon: "🏫" },
         { href: "/admin/settings", label: "設定", icon: "⚙️" },
     ];
 
